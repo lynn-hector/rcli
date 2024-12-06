@@ -1,18 +1,7 @@
-use std::{fmt, path::Path, str::FromStr, };
-use clap::{Args, Parser};
-
-#[derive(Debug, Parser)]
-#[command(name="rcli", version, author, about, long_about=None)]
-pub struct Opts {
-    #[command(subcommand)]
-    pub cmd: SubCommand,
-}
-
-#[derive(Debug, Parser)]
-pub enum SubCommand {
-    #[command(name = "csv", about = "Show CSV, or convert CSV to other formats")]
-    Csv(CsvOpts),
-}
+use super::verify_file;
+use std::fmt;
+use std::str::FromStr;
+use clap::Args;
 
 #[derive(Debug, Clone, Copy)]
 pub enum OutputFormat {
@@ -24,7 +13,7 @@ pub enum OutputFormat {
 
 #[derive(Debug, Args)]
 pub struct CsvOpts {
-    #[arg(short, long, value_parser = verify_input_file)]
+    #[arg(short, long, value_parser = verify_file)]
     pub input: String,
 
     #[arg(short, long)]
@@ -40,23 +29,15 @@ pub struct CsvOpts {
     pub header: bool,
 }
 
-fn verify_input_file(file_name: &str) -> Result<String, &'static str>{
-    if Path::new(file_name).exists() {
-        Ok(file_name.into())
-    } else {
-        return Err("File not found");
-    }
-}
-
 
 fn parse_format(format: &str) -> Result<OutputFormat, anyhow::Error> {
-   format.parse::<OutputFormat>()
+    format.parse::<OutputFormat>()
 }
 
 impl From<OutputFormat> for &'static str{
     fn from(format: OutputFormat) -> Self {
         match format {
-           OutputFormat::Json =>  "json",
+            OutputFormat::Json =>  "json",
             OutputFormat::Yaml => "yaml",
             OutputFormat::Toml => "toml",
         }
@@ -81,3 +62,4 @@ impl fmt::Display for OutputFormat {
         write!(f, "{}", Into::<&str>::into(*self))
     }
 }
+

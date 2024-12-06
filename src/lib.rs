@@ -1,5 +1,7 @@
-mod opts;
 mod process;
+mod cli;
+mod utils;
 
-pub use opts::{Opts, SubCommand};
-pub use process::process_csv;
+pub use cli::{Opts, SubCommand,GenPassOpts,Base64SubCommand, Base64Format, TextSignFormat, TextSubCommand};
+pub use process::*;
+pub use utils::*;
