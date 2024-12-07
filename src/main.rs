@@ -4,7 +4,7 @@ use zxcvbn::zxcvbn;
 use tracing_subscriber;
 use rcli::{Opts, process_csv, process_genpass,process_encode,process_decode,
         process_text_verify, process_text_sign, SubCommand,Base64SubCommand, 
-        TextSubCommand, process_text_generate,HttpSubCommand,HttpServerOpts, process_http_serve};
+        TextSubCommand, process_text_generate,HttpSubCommand, process_http_serve};
 
 #[tokio::main]            
 async fn main() -> anyhow::Result<()> {
@@ -73,7 +73,7 @@ async fn main() -> anyhow::Result<()> {
         SubCommand::Http(subcmd) => match subcmd{
             HttpSubCommand::Server(opts) => {
                 println!("serving at http://0.0.0.0:{}", opts.port);
-                process_http_serve(&opts.dir, opts.port).await?;
+                process_http_serve(opts.dir, opts.port).await?;
             }
         }
     }
