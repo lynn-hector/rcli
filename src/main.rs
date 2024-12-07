@@ -1,11 +1,14 @@
 use std::fs;
 use clap::Parser;
 use zxcvbn::zxcvbn;
+use tracing_subscriber;
 use rcli::{Opts, process_csv, process_genpass,process_encode,process_decode,
-           process_text_verify, process_text_sign, SubCommand,Base64SubCommand, TextSubCommand, process_text_generate};
+        process_text_verify, process_text_sign, SubCommand,Base64SubCommand, 
+        TextSubCommand, process_text_generate,HttpSubCommand,HttpServerOpts, process_http_serve};
 
-
-fn main() -> anyhow::Result<()> {
+#[tokio::main]            
+async fn main() -> anyhow::Result<()> {
+    tracing_subscriber::fmt().init();
     let opts: Opts = Opts::parse();
     match opts.cmd {
         SubCommand::Csv(opts) => {
@@ -58,13 +61,19 @@ fn main() -> anyhow::Result<()> {
                     rcli::TextSignFormat::Blake3 => {
                         let name = opts.output.join("blake3.txt");
                         fs::write(name, &key[0])?;
-                     }
+                    }
                     rcli::TextSignFormat::Ed25519 => {
                         let name = opts.output.join("ed25519");
                         fs::write(name.join("sk"), &key[0])?;
                         fs::write(name.join("pk"), &key[1])?;
                     }
                 }
+            }
+        }
+        SubCommand::Http(subcmd) => match subcmd{
+            HttpSubCommand::Server(opts) => {
+                println!("serving at http://0.0.0.0:{}", opts.port);
+                process_http_serve(&opts.dir, opts.port).await?;
             }
         }
     }

@@ -2,6 +2,7 @@ mod csv;
 mod gen_pass;
 mod base64;
 mod text;
+mod http;
 
 use std::path::{Path, PathBuf};
 use clap::Parser;
@@ -9,6 +10,7 @@ pub use csv::{CsvOpts, OutputFormat};
 pub use gen_pass::{GenPassOpts};
 pub use base64::{Base64SubCommand, Base64Format};
 pub use text::{TextSubCommand, TextSignFormat};
+pub use http::{HttpSubCommand, HttpServerOpts};
 
 
 
@@ -29,13 +31,15 @@ pub enum SubCommand {
     Base64(Base64SubCommand),
     #[command(subcommand)]
     Text(TextSubCommand),
+    #[command(subcommand)]
+    Http(HttpSubCommand),
 }
 
 fn verify_file(file_name: &str) -> Result<String, &'static str>{
     if file_name == "-" || Path::new(file_name).exists() {
         Ok(file_name.into())
     } else {
-         Err("File not found")
+        Err("File not found")
     }
 }
 
